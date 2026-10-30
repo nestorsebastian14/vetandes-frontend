@@ -1,0 +1,23 @@
+<header class="header">
+  <button type="button" class="btn-menu" aria-label="Mostrar u ocultar el menú"
+          (click)="toggleMenu.emit()">☰</button>
+
+  <a routerLink="/inicio" class="marca">
+    <span aria-hidden="true">🐾</span> VetAndes
+  </a>
+  <nav class="menubar">
+    <a routerLink="/inicio">Inicio</a>
+    <a href="http://localhost:8080/swagger-ui/index.html" target="_blank" rel="noopener">API</a>
+  </nav>
+
+  @if (auth.sesion(); as s) {
+    <div class="usuario">
+      <span class="nombre">{{ s.nombreCompleto }}</span>
+      <span class="detalle">
+        {{ s.roles.join(' · ') }} · la sesión vence {{ s.expiraEn | date: 'HH:mm' }}
+      </span>
+    </div>
+    <a routerLink="/mi-cuenta" class="btn-cuenta">Mi cuenta</a>
+    <button type="button" class="btn-salir" (click)="salir()">Cerrar sesión</button>
+  }
+</header>

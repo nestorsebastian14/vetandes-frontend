@@ -1,0 +1,19 @@
+tr.anulada td {
+  color: #6b7280;
+  text-decoration: line-through;
+}
+
+tr.anulada td:last-child,
+tr.anulada td .badge {
+  text-decoration: none;
+}
+
+.resumen {
+  margin-top: 12px;
+  color: #4b5563;
+}
+
+code {
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-size: 14px;
+}

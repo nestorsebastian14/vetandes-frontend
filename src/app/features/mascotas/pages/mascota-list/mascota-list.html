@@ -1,0 +1,81 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>Mascotas</h2>
+      <p class="subtitulo-pagina">Pacientes de la clínica. Las registra la recepción.</p>
+    </div>
+    <a *appSiPermiso="'MASCOTA_ESCRIBIR'" routerLink="nuevo" class="btn btn-primary">+ Nueva mascota</a>
+  </header>
+
+  <div class="filtros card">
+    <label>
+      Buscar
+      <input class="input" type="search" placeholder="Nombre, raza o propietario…" [value]="busqueda()"
+             (input)="busqueda.set($any($event.target).value)" />
+    </label>
+    <label>
+      Propietario
+      <select class="input" (change)="filtrarPorPropietario($any($event.target).value)">
+        <option value="">Todos los propietarios</option>
+        @for (p of propietarios(); track p.id) {
+          <option [value]="p.id">{{ p.nombres }} · DNI {{ p.dni }}</option>
+        }
+      </select>
+    </label>
+    <button type="button" class="btn" (click)="cargar()">Actualizar</button>
+  </div>
+
+  @if (error()) {
+    <div class="alerta" role="alert">{{ error() }}</div>
+  }
+  @if (aviso()) {
+    <div class="exito" role="status">{{ aviso() }}</div>
+  }
+
+  @if (cargando()) {
+    <p class="estado">Cargando mascotas…</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Especie</th>
+          <th>Raza</th>
+          <th>Sexo</th>
+          <th>Nacimiento</th>
+          <th>Edad</th>
+          <th>Propietario</th>
+          <th *appSiPermiso="'MASCOTA_ESCRIBIR'">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of filtradas(); track m.id) {
+          <tr>
+            <td><strong>{{ m.nombre }}</strong></td>
+            <td><span class="chip">{{ m.especie }}</span></td>
+            <td>{{ m.raza ?? '—' }}</td>
+            <td>{{ m.sexo === 'M' ? 'Macho' : 'Hembra' }}</td>
+            <td>{{ m.fechaNacimiento | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ edad(m) }}</td>
+            <!-- Nombre del propietario, no su id: lo trae MascotaResponseDTO -->
+            <td>{{ m.propietarioNombre }}</td>
+            <td *appSiPermiso="'MASCOTA_ESCRIBIR'" class="acciones">
+              <a [routerLink]="[m.id, 'editar']" class="btn">Editar</a>
+              <button type="button" class="btn btn-peligro" (click)="eliminar(m)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="puedeEscribir() ? 8 : 7" class="vacio">
+              @if (busqueda() || propietarioFiltro()) {
+                Ninguna mascota coincide con el filtro.
+              } @else {
+                No hay mascotas registradas.
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

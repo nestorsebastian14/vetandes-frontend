@@ -1,0 +1,87 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>Prestaciones</h2>
+      <p class="subtitulo-pagina">Catálogo de servicios de la clínica. Lo mantiene el veterinario.</p>
+    </div>
+    <a *appSiPermiso="'PRESTACION_ESCRIBIR'" routerLink="nuevo" class="btn btn-primary">+ Nueva prestación</a>
+  </header>
+
+  <div class="filtros card">
+    <label>
+      Buscar
+      <input class="input" type="search" placeholder="Código o nombre…" [value]="busqueda()"
+             (input)="busqueda.set($any($event.target).value)" />
+    </label>
+    <label>
+      Especie aplicable
+      <select class="input" (change)="filtrarPorEspecie($any($event.target).value)">
+        <option value="">Todas las especies</option>
+        @for (e of especies; track e) {
+          <option [value]="e">{{ e }}</option>
+        }
+      </select>
+    </label>
+    <button type="button" class="btn" (click)="cargar()">Actualizar</button>
+  </div>
+
+  <!-- Mensaje que devuelve el backend: un 409 se muestra aquí y la lista sigue usable -->
+  @if (error()) {
+    <div class="alerta" role="alert">{{ error() }}</div>
+  }
+  @if (aviso()) {
+    <div class="exito" role="status">{{ aviso() }}</div>
+  }
+
+  @if (cargando()) {
+    <p class="estado">Cargando prestaciones…</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th class="monto">Precio</th>
+          <th>Especie</th>
+          <th>Estado</th>
+          <th *appSiPermiso="'PRESTACION_ESCRIBIR'">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of filtradas(); track p.id) {
+          <tr>
+            <td><code>{{ p.codigo }}</code></td>
+            <td>{{ p.nombre }}</td>
+            <td class="monto">{{ p.precio | currency: 'PEN' : 'S/ ' }}</td>
+            <td><span class="chip">{{ p.especieAplicable }}</span></td>
+            <td>
+              <span class="badge" [class.inactivo]="!p.activo">{{ p.activo ? 'Activa' : 'Inactiva' }}</span>
+            </td>
+            <td *appSiPermiso="'PRESTACION_ESCRIBIR'" class="acciones">
+              <a [routerLink]="[p.id, 'editar']" class="btn">Editar</a>
+              <button type="button" class="btn" (click)="cambiarEstado(p)">
+                {{ p.activo ? 'Dar de baja' : 'Activar' }}
+              </button>
+              @if (p.activo) {
+                <button type="button" class="btn btn-peligro" (click)="eliminar(p)">Eliminar</button>
+              }
+              @if (bajaSugerida() === p.id) {
+                <small class="nota-409">En uso: use «Dar de baja» en lugar de eliminar.</small>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="puedeEscribir() ? 6 : 5" class="vacio">
+              @if (busqueda() || especieFiltro()) {
+                Ninguna prestación coincide con el filtro.
+              } @else {
+                No hay prestaciones registradas.
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

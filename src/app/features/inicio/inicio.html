@@ -1,0 +1,32 @@
+<section class="page">
+  <div class="card bienvenida">
+    <h2>Bienvenido, {{ auth.sesion()?.nombreCompleto }}</h2>
+    <p>
+      VetAndes Web · clínica veterinaria. Su perfil
+      (<strong>{{ auth.sesion()?.roles?.join(' · ') }}</strong>) determina lo que puede hacer:
+      el menú solo muestra los módulos para los que tiene permiso.
+    </p>
+
+    <div class="atajos">
+      <a *appSiPermiso="'ATENCION_REGISTRAR'" routerLink="/atenciones/nueva" class="btn btn-primary">
+        + Registrar atención
+      </a>
+      <a *appSiPermiso="'MASCOTA_ESCRIBIR'" routerLink="/mascotas/nuevo" class="btn">+ Nueva mascota</a>
+      <a *appSiPermiso="'PRESTACION_ESCRIBIR'" routerLink="/prestaciones/nuevo" class="btn">
+        + Nueva prestación
+      </a>
+    </div>
+  </div>
+
+  <h3 class="titulo-modulos">Sus módulos</h3>
+  <div class="modulos">
+    @for (m of accesos(); track m.ruta) {
+      <a [routerLink]="m.ruta" class="card modulo">
+        <span class="icono" aria-hidden="true">{{ m.icono }}</span>
+        <span class="etiqueta">{{ m.etiqueta }}</span>
+      </a>
+    } @empty {
+      <p class="estado">Su usuario no tiene módulos asignados. Consulte al administrador.</p>
+    }
+  </div>
+</section>

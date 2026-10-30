@@ -1,0 +1,12 @@
+.barra {
+  display: block;
+  height: 14px;
+  min-width: 2px;
+  border-radius: 999px;
+  background: var(--vet-primario, #0f766e);
+}
+
+.tabla tfoot td {
+  border-top: 2px solid var(--vet-primario, #0f766e);
+  border-bottom: 0;
+}

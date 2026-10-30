@@ -1,0 +1,71 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>Atenciones por especie</h2>
+      <p class="subtitulo-pagina">
+        Agrupado por el backend con una consulta JPQL. Excluye las atenciones anuladas.
+      </p>
+    </div>
+  </header>
+
+  <form [formGroup]="filtros" (ngSubmit)="consultar()" class="card filtros">
+    <label>
+      Desde
+      <input class="input" type="date" formControlName="desde" />
+    </label>
+    <label>
+      Hasta
+      <input class="input" type="date" formControlName="hasta" />
+    </label>
+    <div class="botones">
+      <button type="button" class="btn" (click)="limpiar()">Limpiar</button>
+      <button type="submit" class="btn btn-primary">Consultar</button>
+    </div>
+  </form>
+
+  @if (error()) {
+    <div class="alerta" role="alert">{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <p class="estado">Calculando el reporte…</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Especie</th>
+          <th class="monto">Atenciones</th>
+          <th class="monto">Importe total</th>
+          <th>Participación</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of filas(); track f.especie) {
+          <tr>
+            <td><span class="chip">{{ f.especie }}</span></td>
+            <td class="monto">{{ f.cantidadAtenciones }}</td>
+            <td class="monto">{{ f.importeTotal | currency: 'PEN' : 'S/ ' }}</td>
+            <td>
+              <span class="barra" [style.width.%]="porcentaje(f)"
+                    [attr.aria-label]="porcentaje(f) + ' por ciento del importe mayor'"></span>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="vacio">No hay atenciones registradas en el rango consultado.</td>
+          </tr>
+        }
+      </tbody>
+      @if (filas().length) {
+        <tfoot>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td class="monto"><strong>{{ totalAtenciones() }}</strong></td>
+            <td class="monto"><strong>{{ totalImporte() | currency: 'PEN' : 'S/ ' }}</strong></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      }
+    </table>
+  }
+</section>

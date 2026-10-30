@@ -1,0 +1,51 @@
+.bienvenida {
+  border-left: 4px solid var(--vet-acento);
+}
+
+.bienvenida p {
+  max-width: 68ch;
+  color: #4b5563;
+}
+
+.atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.titulo-modulos {
+  margin: 24px 0 12px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+
+.modulos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.modulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  text-decoration: none;
+  color: #1f2937;
+  border: 1px solid transparent;
+}
+
+.modulo:hover {
+  border-color: var(--vet-primario);
+}
+
+.icono {
+  font-size: 26px;
+}
+
+.etiqueta {
+  font-weight: 600;
+}

@@ -1,0 +1,44 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>Mi cuenta</h2>
+      <p class="subtitulo-pagina">Datos y permisos que devuelve GET /auth/me.</p>
+    </div>
+  </header>
+
+  @if (permisosCambiaron()) {
+    <div class="aviso" role="status">
+      Sus permisos en el servidor ya no coinciden con los de su token. Cierre sesión y vuelva a
+      ingresar para recibir un token actualizado.
+    </div>
+  }
+
+  @if (cargando()) {
+    <p class="estado">Cargando sus datos…</p>
+  } @else if (error()) {
+    <div class="alerta" role="alert">{{ error() }}</div>
+  } @else if (perfil(); as p) {
+    <div class="card">
+      <h3>{{ p.nombreCompleto }}</h3>
+      <p><strong>Usuario:</strong> {{ p.username }}</p>
+
+      <h4>Roles</h4>
+      <div class="chips">
+        @for (rol of p.roles; track rol) {
+          <span class="chip">{{ rol }}</span>
+        } @empty {
+          <span>Sin roles asignados.</span>
+        }
+      </div>
+
+      <h4>Permisos</h4>
+      <ul class="permisos">
+        @for (permiso of p.permisos; track permiso) {
+          <li><code>{{ permiso }}</code></li>
+        } @empty {
+          <li>Sin permisos asignados.</li>
+        }
+      </ul>
+    </div>
+  }
+</section>

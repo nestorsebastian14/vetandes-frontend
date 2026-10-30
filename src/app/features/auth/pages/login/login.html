@@ -1,0 +1,49 @@
+<main class="pantalla">
+  <section class="card login">
+    <header class="cabecera">
+      <span class="marca"><span aria-hidden="true">🐾</span> VetAndes</span>
+      <p>Clínica veterinaria · atenciones</p>
+    </header>
+
+    <h2>Iniciar sesión</h2>
+
+    @if (expirada()) {
+      <div class="aviso" role="status">Su sesión expiró. Inicie sesión nuevamente.</div>
+    }
+    <!-- El 401 del login NO cierra sesión ni redirige: se muestra aquí -->
+    @if (error()) {
+      <div class="alerta" role="alert">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="entrar()" novalidate>
+      <label>
+        Usuario
+        <input class="input" type="text" formControlName="username" autocomplete="username" autofocus />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+          <small class="campo-error">El usuario es obligatorio.</small>
+        }
+      </label>
+
+      <label>
+        Contraseña
+        <span class="clave">
+          <input class="input" [type]="verClave() ? 'text' : 'password'" formControlName="password"
+                 autocomplete="current-password" />
+          <button type="button" class="ver" (click)="verClave.set(!verClave())"
+                  [attr.aria-label]="verClave() ? 'Ocultar la contraseña' : 'Mostrar la contraseña'">
+            {{ verClave() ? '🙈' : '👁️' }}
+          </button>
+        </span>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <small class="campo-error">La contraseña es obligatoria.</small>
+        }
+      </label>
+
+      <button type="submit" class="btn btn-primary entrar" [disabled]="enviando()">
+        {{ enviando() ? 'Ingresando…' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <p class="pie">La sesión se guarda solo en esta pestaña: al cerrarla hay que volver a entrar.</p>
+  </section>
+</main>

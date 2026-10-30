@@ -1,0 +1,18 @@
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.nota-409 {
+  display: block;
+  width: 100%;
+  color: #b42318;
+  font-size: 13px;
+}
+
+code {
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-size: 14px;
+}

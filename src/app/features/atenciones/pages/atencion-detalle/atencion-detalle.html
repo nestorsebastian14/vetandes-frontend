@@ -1,0 +1,117 @@
+<section class="page">
+  <!-- Mensaje con el número que generó el backend al registrar -->
+  @if (aviso()) {
+    <div class="exito" role="status">{{ aviso() }}</div>
+  }
+  @if (error()) {
+    <div class="alerta" role="alert">{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <p class="estado">Cargando la atención…</p>
+  } @else if (atencion(); as a) {
+    <article class="card ficha" [class.anulada]="a.estado === 'ANULADA'">
+      <header class="cabecera">
+        <div>
+          <h2>Atención {{ a.numero }}</h2>
+          <p class="fecha">{{ a.fecha | date: 'dd/MM/yyyy HH:mm' }} · registró {{ a.usuarioRegistro }}</p>
+        </div>
+        <span class="badge grande" [class.inactivo]="a.estado === 'ANULADA'">{{ a.estado }}</span>
+      </header>
+
+      <dl class="datos">
+        <div><dt>Mascota</dt><dd>{{ a.mascotaNombre }}</dd></div>
+        <div><dt>Especie</dt><dd>{{ a.mascotaEspecie }}</dd></div>
+        @if (a.propietarioNombre) {
+          <div><dt>Propietario</dt><dd>{{ a.propietarioNombre }}</dd></div>
+        }
+        <div><dt>Peso</dt><dd>{{ a.peso }} kg</dd></div>
+      </dl>
+
+      @if (a.diagnostico) {
+        <p class="diagnostico"><strong>Diagnóstico:</strong> {{ a.diagnostico }}</p>
+      }
+
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Prestación</th>
+            <th class="monto">Precio unitario</th>
+            <th class="monto">Cantidad</th>
+            <th class="monto">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of a.detalles; track d.prestacionId) {
+            <tr>
+              <td>
+                @if (d.prestacionCodigo) {
+                  <code>{{ d.prestacionCodigo }}</code>
+                }
+                {{ d.prestacionNombre }}
+              </td>
+              <td class="monto">{{ d.precioUnitario | currency: 'PEN' : 'S/ ' }}</td>
+              <td class="monto">{{ d.cantidad }}</td>
+              <td class="monto">{{ d.subtotal | currency: 'PEN' : 'S/ ' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Importes tal como los calculó y guardó el backend -->
+      <dl class="importes">
+        <div>
+          <dt>{{ a.detalles.length }} prestaciones · {{ unidades() }} unidades</dt>
+          <dd></dd>
+        </div>
+        <div><dt>Subtotal</dt><dd>{{ a.subtotal | currency: 'PEN' : 'S/ ' }}</dd></div>
+        <div [class.activo]="a.descuento > 0">
+          <dt>Descuento</dt>
+          <dd>− {{ a.descuento | currency: 'PEN' : 'S/ ' }}</dd>
+        </div>
+        <div class="fila-total"><dt>Total</dt><dd>{{ a.total | currency: 'PEN' : 'S/ ' }}</dd></div>
+      </dl>
+
+      @if (a.estado === 'ANULADA' && a.motivoAnulacion) {
+        <p class="motivo-anulacion"><strong>Motivo de anulación:</strong> {{ a.motivoAnulacion }}</p>
+      }
+
+      <div class="acciones">
+        <a routerLink="/atenciones" class="btn">Volver a la consulta</a>
+        <a *appSiPermiso="'ATENCION_REGISTRAR'" routerLink="/atenciones/nueva" class="btn">Nueva atención</a>
+        @if (puedeAnular() && !mostrarFormulario()) {
+          <button type="button" class="btn btn-peligro" (click)="mostrarFormulario.set(true)">Anular</button>
+        }
+      </div>
+
+      <!-- Anulación con motivo (RN-05) -->
+      @if (mostrarFormulario()) {
+        <div class="anulacion" role="group" aria-label="Anular la atención">
+          <h3>Anular la atención {{ a.numero }}</h3>
+          <p class="nota">
+            Solo se puede anular una atención REGISTRADA y con no más de 48 horas desde su registro.
+            La regla la verifica el backend.
+          </p>
+          <label>
+            Motivo
+            <textarea class="input" rows="3" [formControl]="motivo" maxlength="200"
+                      placeholder="Describa por qué se anula (de 10 a 200 caracteres)"></textarea>
+          </label>
+          @if (motivo.touched && motivo.hasError('required')) {
+            <small class="error">El motivo es obligatorio.</small>
+          }
+          @if (motivo.hasError('minlength')) {
+            <small class="error">El motivo debe tener al menos 10 caracteres.</small>
+          }
+          <div class="acciones">
+            <button type="button" class="btn" [disabled]="anulando()"
+                    (click)="mostrarFormulario.set(false)">Cancelar</button>
+            <button type="button" class="btn btn-peligro" [disabled]="anulando()" (click)="anular()">
+              {{ anulando() ? 'Anulando…' : 'Confirmar anulación' }}
+            </button>
+          </div>
+        </div>
+      }
+    </article>
+  }
+</section>

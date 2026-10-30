@@ -1,0 +1,97 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>Atenciones</h2>
+      <p class="subtitulo-pagina">Consulta con los filtros del contrato del API.</p>
+    </div>
+    <!-- El VETERINARIO no tiene ATENCION_REGISTRAR: no ve este botón -->
+    <a *appSiPermiso="'ATENCION_REGISTRAR'" routerLink="nueva" class="btn btn-primary">+ Nueva atención</a>
+  </header>
+
+  <form [formGroup]="filtros" (ngSubmit)="buscar()" class="card filtros">
+    <label>
+      Mascota
+      <input class="input" formControlName="mascota" placeholder="Nombre parcial…" />
+    </label>
+    <label>
+      Especie
+      <select class="input" formControlName="especie">
+        <option [ngValue]="null">Todas</option>
+        @for (e of especies; track e) {
+          <option [ngValue]="e">{{ e }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      Estado
+      <select class="input" formControlName="estado">
+        <option [ngValue]="null">Todos</option>
+        <option value="REGISTRADA">Registrada</option>
+        <option value="ANULADA">Anulada</option>
+      </select>
+    </label>
+    <label>
+      Desde
+      <input class="input" type="date" formControlName="desde" />
+    </label>
+    <label>
+      Hasta
+      <input class="input" type="date" formControlName="hasta" />
+    </label>
+    <div class="botones">
+      <button type="button" class="btn" (click)="limpiar()">Limpiar</button>
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+  </form>
+
+  @if (error()) {
+    <div class="alerta" role="alert">{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <p class="estado">Buscando atenciones…</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Fecha</th>
+          <th>Mascota</th>
+          <th>Especie</th>
+          <th>Prestaciones</th>
+          <th class="monto">Total</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of atenciones(); track a.id) {
+          <tr [class.anulada]="a.estado === 'ANULADA'">
+            <td><code>{{ a.numero }}</code></td>
+            <td>{{ a.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ a.mascotaNombre }}</td>
+            <td><span class="chip">{{ a.mascotaEspecie }}</span></td>
+            <td>{{ a.detalles.length }}</td>
+            <td class="monto">{{ a.total | currency: 'PEN' : 'S/ ' }}</td>
+            <td>
+              <span class="badge" [class.inactivo]="a.estado === 'ANULADA'">{{ a.estado }}</span>
+            </td>
+            <td><a [routerLink]="[a.id]" class="btn">Ver detalle</a></td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="vacio">No hay atenciones con esos filtros.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (atenciones().length) {
+      <footer class="resumen">
+        {{ atenciones().length }}
+        {{ atenciones().length === 1 ? 'atención' : 'atenciones' }} ·
+        total sin anuladas: <strong>{{ totalRegistrado() | currency: 'PEN' : 'S/ ' }}</strong>
+      </footer>
+    }
+  }
+</section>
